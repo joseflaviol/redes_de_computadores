@@ -160,34 +160,39 @@ public class StudentService {
 				HttpStatus.NOT_FOUND, "Student not found."
 		));
 
-		if (courseStudentRepository.findAllByStudentId(id).size() + courseIds.size() > 5) {
+		if (courseIds.size() > 5) {
 			throw new ResponseStatusException(
 				HttpStatus.FORBIDDEN, "Student cannot be enrolled in  more than 5 courses"
 			);
 		}
 
+		courseStudentRepository.deleteByStudentId(id);
+
 		List<Long> res = new ArrayList<>();
 		res.add(id);
 
-		res.addAll( courseIds.stream().map(courseId -> {
+		res.addAll( courseIds.stream()
+				.filter(courseId -> {
+					courseRepository.findById(courseId).orElseThrow(() -> new ResponseStatusException(
+									HttpStatus.NOT_FOUND, "Course not found."
+							)
+					);
 
-			courseRepository.findById(courseId).orElseThrow(
-					() -> new ResponseStatusException(
-							HttpStatus.NOT_FOUND, "Course not found."
-					)
-			);
+					if (courseStudentRepository.findAllByCourseId(courseId).size() + 1 > 50) {
+						throw new ResponseStatusException(
+								HttpStatus.FORBIDDEN, "Course cannot have more than 50 students"
+						);
+					}
 
-			if (courseStudentRepository.findAllByCourseId(courseId).size() + 1 > 50) {
-				throw new ResponseStatusException(
-						HttpStatus.FORBIDDEN, "Course cannot have more than 50 students"
-				);
-			}
+					return true;
+				})
+				.map(courseId -> {
+					courseStudentRepository.save(new CourseStudent(id, courseId, Timestamp.from(Instant.now())));
 
-			courseStudentRepository.save(new CourseStudent(id, courseId, Timestamp.from(Instant.now())));
-
-			return courseId;
-		}).collect(Collectors.toList()));
-
+					return courseId;
+				})
+				.collect(Collectors.toList())
+		);
 		return res;
 	}
 }

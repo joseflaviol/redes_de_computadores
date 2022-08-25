@@ -8,12 +8,10 @@ import java.util.Collection;
 import java.util.List;
 
 public interface CourseStudentRepository extends JpaRepository<CourseStudent, Long> {
-
     List<CourseStudent> findAllByStudentId(Long id);
-
-    List<CourseStudent> findAllByOrderByStudentIdAsc();
-
     List<CourseStudent> findAllByCourseId(Long id);
-
+    List<CourseStudent> findAllByOrderByStudentIdAsc();
+    List<CourseStudent> findAllByOrderByCourseIdAsc();
     void deleteByStudentId(Long id);
+    void deleteAllByCourseId(Long id);
 }

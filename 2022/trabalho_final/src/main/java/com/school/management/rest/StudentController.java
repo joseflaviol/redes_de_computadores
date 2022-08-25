@@ -23,17 +23,6 @@ public class StudentController {
         this.studentService = studentService;
     }
 
-    /**
-     * GET methods (retrieving info)
-     */
-
-    /**
-     * HTTP method: GET
-     * <p>
-     * //@param withoutCourses = true --> return the list of students without any course (default: false).
-     *
-     * @return the list of students.
-     */
     @GetMapping(value = "/")
     @ResponseStatus(HttpStatus.OK)
 	public List<StudentDto> getStudents(@RequestParam(name = "without-courses") Optional<Boolean> withoutCourses) {
@@ -71,49 +60,18 @@ public class StudentController {
         studentService.deleteStudent(id, confirmDeletion.orElse(false));
     }
 
-    /**
-     *
-     * TODO methods
-     *
-     */
-
-    /**
-     * HTTP method: GET
-     * <p>
-     * TODO
-     *
-     * @param id = the student id.
-     * @return list of courses the student is enrolled.
-     */
     @GetMapping(value = "/{id}/courses")
     @ResponseStatus(HttpStatus.OK)
     public List<CourseDto> getCoursesFromStudent(@PathVariable Long id) {
         return studentService.enrolled(id);
     }
 
-    /**
-     * HTTP method: GET
-     * <p>
-     * TODO
-     *
-     * @return list of relationships between students and courses, ordered by student and course.
-     */
     @GetMapping(value = "/courses")
     @ResponseStatus(HttpStatus.OK)
     public List<CourseStudentDto> getRelations() {
         return studentService.relations();
     }
 
-    /**
-     * HTTP method: PUT
-     * <p>
-     * TODO
-     *
-     * @param id        = the student id.
-     * @param courseIds = the ids of the courses to enroll the student. Limited to 5 courses.
-     *                  Ex: [1, 2, 3]
-     * @return a list containing the student id and the enrolled courses.
-     */
     @PutMapping(value = "/{id}/courses")
     @ResponseStatus(HttpStatus.OK)
     public List<Long> updateStudentCourses(@PathVariable Long id, @RequestBody List<Long> courseIds) {
